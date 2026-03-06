@@ -124,6 +124,7 @@ const injectVisualisation = () => {
     WL.injectElements(`
     <html:header id="messageHeader">
         <html:div id="ThreadVisHeaderBox">
+            <html:div id="ThreadVisFolderPills"></html:div>
             <html:div id="ThreadVis">
                 <box id="ThreadVisBox" style="overflow: hidden;" context="ThreadVisPopUp">
                     <stack id="ThreadVisStack" />

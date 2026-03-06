@@ -146,6 +146,11 @@ export class Visualisation {
     #panning = false;
 
     /**
+     * Folder pills container
+     */
+    #pillsContainer;
+
+    /**
      * Constructor for visualisation class
      * 
      * @return {ThreadVis.Visualisation} A new visualisation object
@@ -161,6 +166,7 @@ export class Visualisation {
         this.#box = this.#document.getElementById("ThreadVisBox");
         this.#stack = this.#document.getElementById("ThreadVisStack");
         this.#popups = this.#document.getElementById("ThreadVisPopUpTooltips");
+        this.#pillsContainer = this.#document.getElementById("ThreadVisFolderPills");
 
         // attach event listeners
         this.#document.addEventListener("mousemove", (event) => this.#onMouseMove(event), false);
@@ -184,6 +190,43 @@ export class Visualisation {
         // also delete all popupset menus
         while (this.#popups.firstChild) {
             this.#popups.removeChild(this.#popups.firstChild);
+        }
+
+        // clear folder pills
+        this.#clearFolderPills();
+    }
+
+    /**
+     * Clear folder pills from the always-visible area
+     */
+    #clearFolderPills() {
+        if (this.#pillsContainer) {
+            while (this.#pillsContainer.firstChild) {
+                this.#pillsContainer.removeChild(this.#pillsContainer.firstChild);
+            }
+        }
+    }
+
+    /**
+     * Render folder pills in the always-visible area above the visualisation
+     * 
+     * @param {Array<String>} threadFolders - All unique folder names in the thread
+     * @param {String} currentFolder - The folder name of the currently selected message
+     */
+    #renderFolderPills(threadFolders, currentFolder) {
+        this.#clearFolderPills();
+        if (!this.#pillsContainer || threadFolders.length === 0) {
+            return;
+        }
+
+        for (const folderName of threadFolders) {
+            const pill = this.#document.createElement("span");
+            pill.textContent = folderName;
+            pill.classList.add("folder-pill");
+            if (folderName === currentFolder) {
+                pill.classList.add("current");
+            }
+            this.#pillsContainer.appendChild(pill);
         }
     }
 
@@ -434,12 +477,11 @@ export class Visualisation {
      * @param {Boolean} selected - True if the container is selected
      * @param {Boolean} circle - True to draw a circle around the dot
      * @param {Number} opacity - The opacity of the dot
-     * @param {Array<String>} threadFolders - All folder names in the thread
      * @return {ThreadVis.ContainerVisualisation} - The dot object
      */
-    #drawDot(container, colour, left, top, selected, circle, opacity, threadFolders) {
+    #drawDot(container, colour, left, top, selected, circle, opacity) {
         const msg = new ContainerVisualisation(this.#threadvis, this.#document, this.#stack, container, colour,
-            left, top, selected, this.#resize, circle, opacity, threadFolders);
+            left, top, selected, this.#resize, circle, opacity);
 
         return msg;
     }
@@ -880,6 +922,10 @@ export class Visualisation {
                 .map((container) => container.message.folderName)
         )].sort();
 
+        // render folder pills in the always-visible area above the visualisation
+        const selectedFolder = positionedThread.selected?.message?.folderName;
+        this.#renderFolderPills(threadFolders, selectedFolder);
+
         positionedThread.containers.forEach((container) => {
             let colour = this.#COLOUR_DUMMY;
             let opacity = 1;
@@ -909,7 +955,7 @@ export class Visualisation {
                 // only display black circle to highlight selected message
                 // if we are using more than one colour
                 const circle = prefColour === "single" ? false : true;
-                this.#containerVisualisations[container.id] = this.#drawDot(container, colour, container.x, thisTopHeight, container.selected, circle, opacity, threadFolders);
+                this.#containerVisualisations[container.id] = this.#drawDot(container, colour, container.x, thisTopHeight, container.selected, circle, opacity);
             } else {
                 this.#containerVisualisations[container.id].redraw(this.#resize, container.x, thisTopHeight, container.selected, colour, opacity);
             }
