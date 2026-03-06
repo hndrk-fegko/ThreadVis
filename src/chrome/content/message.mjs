@@ -88,7 +88,13 @@ export class Message {
             // Extract the path after the server part
             const url = new URL(uri);
             // pathname starts with "/", remove leading slash
-            let path = decodeURIComponent(url.pathname).replace(/^\//, "");
+            let path;
+            try {
+                path = decodeURIComponent(url.pathname).replace(/^\//, "");
+            } catch (e) {
+                // invalid percent-encoding in pathname, use raw pathname
+                path = url.pathname.replace(/^\//, "");
+            }
             return path || uri;
         } catch (e) {
             // fallback: return raw URI

@@ -298,12 +298,12 @@ export class ContainerVisualisation {
                     pill.style.margin = "0";
 
                     if (folderName === currentFolder) {
-                        pill.style.background = "#3366cc";
+                        pill.style.background = "#2952a3";
                         pill.style.color = "#ffffff";
                         pill.style.fontWeight = "bold";
                     } else {
                         pill.style.background = "#e0e0e0";
-                        pill.style.color = "#333333";
+                        pill.style.color = "#000000";
                     }
                     pillsContainer.appendChild(pill);
                 }
