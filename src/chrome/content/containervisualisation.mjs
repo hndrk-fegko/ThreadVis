@@ -251,6 +251,15 @@ export class ContainerVisualisation {
             subjectLabel.style.fontWeight = "bold";
             subjectText.setAttribute("value", this.#container.message.subject);
 
+            const folderLabel = this.#document.createXULElement("label");
+            const folderText = this.#document.createXULElement("label");
+            const folder = this.#document.createXULElement("hbox");
+            folder.appendChild(folderLabel);
+            folder.appendChild(folderText);
+            folderLabel.setAttribute("value", Strings.getString("tooltip.folder"));
+            folderLabel.style.fontWeight = "bold";
+            folderText.setAttribute("value", this.#container.message.folderName);
+
             const body = this.#document.createXULElement("description");
             const bodyText = this.#document.createTextNode(this.#container.message.body);
             body.appendChild(bodyText);
@@ -258,6 +267,7 @@ export class ContainerVisualisation {
             this.#tooltip.appendChild(author);
             this.#tooltip.appendChild(date);
             this.#tooltip.appendChild(subject);
+            this.#tooltip.appendChild(folder);
             this.#tooltip.appendChild(this.#document.createXULElement("separator"));
             this.#tooltip.appendChild(body);
         } else {

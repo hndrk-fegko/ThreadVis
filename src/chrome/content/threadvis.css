@@ -48,6 +48,37 @@ splitter.mousehidden:hover {
     display: none;
     grid-row-start: 2;
     grid-column: 2/3;
+    flex-direction: column;
+}
+
+#ThreadVisFolderPills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px 4px;
+}
+
+#ThreadVisFolderPills:empty {
+    display: none;
+}
+
+#ThreadVisFolderPills .folder-pill {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin: 0;
+    line-height: 1.2;
+}
+
+#ThreadVisFolderPills .folder-pill.current {
+    background: #2952a3;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#ThreadVisFolderPills .folder-pill:not(.current) {
+    background: #e0e0e0;
+    color: #000000;
 }
 
 #ThreadVis {
@@ -55,6 +86,8 @@ splitter.mousehidden:hover {
     grid-template-columns: minmax(0, 1fr) 3px;
     grid-template-rows: minmax(0, 1fr) 3px;
     height: 100%;
+    flex: 1;
+    min-height: 0;
 }
 
 #ThreadVisBox {
@@ -119,7 +152,7 @@ splitter.mousehidden:hover {
  * space available anyways and we'd mess around with the grid display
  */
 #messageHeader:not([compact]).threadvis #ThreadVisHeaderBox {
-    display: inherit;
+    display: flex;
 }
 
 #messageHeader:not([compact]).threadvis {
