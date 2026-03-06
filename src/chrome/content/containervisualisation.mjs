@@ -135,6 +135,11 @@ export class ContainerVisualisation {
     #tooltip;
 
     /**
+     * All folder names in the thread (for folder pill display)
+     */
+    #threadFolders;
+
+    /**
      * Constructor for visualisation class
      * 
      * @constructor
@@ -149,10 +154,11 @@ export class ContainerVisualisation {
      * @param {Number} resize - The resize parameter
      * @param {Boolean} circle - True to draw a circle
      * @param {Number} opacity - The opacity
+     * @param {Array<String>} threadFolders - All folder names in the thread
      * @return {ThreadVis.ContainerVisualisation} - A new container visualisation
      */
     constructor(threadvis, document, stack, container, colour, left, top, selected, resize,
-            circle, opacity) {
+            circle, opacity, threadFolders) {
         Object.seal(this);
 
         this.#dotSize = Preferences.get(Preferences.VIS_DOTSIZE);
@@ -171,6 +177,7 @@ export class ContainerVisualisation {
         this.#resize = resize;
         this.#isCircle = circle;
         this.#opacity = opacity;
+        this.#threadFolders = threadFolders || [];
 
         // calculate style
         // full === received message
@@ -251,6 +258,15 @@ export class ContainerVisualisation {
             subjectLabel.style.fontWeight = "bold";
             subjectText.setAttribute("value", this.#container.message.subject);
 
+            const folderLabel = this.#document.createXULElement("label");
+            const folderText = this.#document.createXULElement("label");
+            const folder = this.#document.createXULElement("hbox");
+            folder.appendChild(folderLabel);
+            folder.appendChild(folderText);
+            folderLabel.setAttribute("value", Strings.getString("tooltip.folder"));
+            folderLabel.style.fontWeight = "bold";
+            folderText.setAttribute("value", this.#container.message.folderName);
+
             const body = this.#document.createXULElement("description");
             const bodyText = this.#document.createTextNode(this.#container.message.body);
             body.appendChild(bodyText);
@@ -258,8 +274,41 @@ export class ContainerVisualisation {
             this.#tooltip.appendChild(author);
             this.#tooltip.appendChild(date);
             this.#tooltip.appendChild(subject);
+            this.#tooltip.appendChild(folder);
             this.#tooltip.appendChild(this.#document.createXULElement("separator"));
             this.#tooltip.appendChild(body);
+
+            // add folder pills for all folders in the thread
+            if (this.#threadFolders.length > 0) {
+                this.#tooltip.appendChild(this.#document.createXULElement("separator"));
+                const pillsContainer = this.#document.createXULElement("hbox");
+                pillsContainer.setAttribute("align", "center");
+                pillsContainer.style.display = "flex";
+                pillsContainer.style.flexWrap = "wrap";
+                pillsContainer.style.gap = "4px";
+                pillsContainer.style.marginTop = "4px";
+
+                const currentFolder = this.#container.message.folderName;
+                for (const folderName of this.#threadFolders) {
+                    const pill = this.#document.createXULElement("label");
+                    pill.setAttribute("value", folderName);
+                    pill.style.padding = "2px 8px";
+                    pill.style.borderRadius = "10px";
+                    pill.style.fontSize = "11px";
+                    pill.style.margin = "0";
+
+                    if (folderName === currentFolder) {
+                        pill.style.background = "#3366cc";
+                        pill.style.color = "#ffffff";
+                        pill.style.fontWeight = "bold";
+                    } else {
+                        pill.style.background = "#e0e0e0";
+                        pill.style.color = "#333333";
+                    }
+                    pillsContainer.appendChild(pill);
+                }
+                this.#tooltip.appendChild(pillsContainer);
+            }
         } else {
             // otherwise we display info about missing message
             const desc1 = this.#document.createXULElement("description");

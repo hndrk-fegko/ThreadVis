@@ -72,6 +72,31 @@ export class Message {
     }
 
     /**
+     * Get human-readable folder name from the folder URI
+     * e.g. "mailbox://user@server/INBOX/Projects" -> "INBOX/Projects"
+     * 
+     * @return {String} - The human-readable folder name
+     */
+    get folderName() {
+        const uri = this.#glodaMessage.folderURI;
+        if (!uri) {
+            return "";
+        }
+        try {
+            // folderURI format: "mailbox://user@server/folder/subfolder"
+            // or "imap://user@server/folder/subfolder"
+            // Extract the path after the server part
+            const url = new URL(uri);
+            // pathname starts with "/", remove leading slash
+            let path = decodeURIComponent(url.pathname).replace(/^\//, "");
+            return path || uri;
+        } catch (e) {
+            // fallback: return raw URI
+            return uri;
+        }
+    }
+
+    /**
      * Get sender of message
      * 
      * @return {String} - The sender of the message

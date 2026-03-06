@@ -434,11 +434,12 @@ export class Visualisation {
      * @param {Boolean} selected - True if the container is selected
      * @param {Boolean} circle - True to draw a circle around the dot
      * @param {Number} opacity - The opacity of the dot
+     * @param {Array<String>} threadFolders - All folder names in the thread
      * @return {ThreadVis.ContainerVisualisation} - The dot object
      */
-    #drawDot(container, colour, left, top, selected, circle, opacity) {
+    #drawDot(container, colour, left, top, selected, circle, opacity, threadFolders) {
         const msg = new ContainerVisualisation(this.#threadvis, this.#document, this.#stack, container, colour,
-            left, top, selected, this.#resize, circle, opacity);
+            left, top, selected, this.#resize, circle, opacity, threadFolders);
 
         return msg;
     }
@@ -872,6 +873,13 @@ export class Visualisation {
             this.#resize = 1 * this.#zoom;
         }
 
+        // collect all unique folder names from the thread for folder pill display
+        const threadFolders = [...new Set(
+            positionedThread.containers
+                .filter((container) => container.message?.folderName)
+                .map((container) => container.message.folderName)
+        )].sort();
+
         positionedThread.containers.forEach((container) => {
             let colour = this.#COLOUR_DUMMY;
             let opacity = 1;
@@ -901,7 +909,7 @@ export class Visualisation {
                 // only display black circle to highlight selected message
                 // if we are using more than one colour
                 const circle = prefColour === "single" ? false : true;
-                this.#containerVisualisations[container.id] = this.#drawDot(container, colour, container.x, thisTopHeight, container.selected, circle, opacity);
+                this.#containerVisualisations[container.id] = this.#drawDot(container, colour, container.x, thisTopHeight, container.selected, circle, opacity, threadFolders);
             } else {
                 this.#containerVisualisations[container.id].redraw(this.#resize, container.x, thisTopHeight, container.selected, colour, opacity);
             }
