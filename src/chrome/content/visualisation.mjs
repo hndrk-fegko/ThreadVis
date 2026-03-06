@@ -923,8 +923,8 @@ export class Visualisation {
         )].sort();
 
         // render folder pills in the always-visible area above the visualisation
-        const selectedFolder = positionedThread.selected?.message?.folderName;
-        this.#renderFolderPills(threadFolders, selectedFolder);
+        const currentMessageFolder = positionedThread.selected?.message?.folderName;
+        this.#renderFolderPills(threadFolders, currentMessageFolder);
 
         positionedThread.containers.forEach((container) => {
             let colour = this.#COLOUR_DUMMY;
